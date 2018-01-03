@@ -1,8 +1,12 @@
 <component name="ProjectDictionaryState">
   <dictionary name="adam">
     <words>
+      <w>dateformat</w>
+      <w>endfor</w>
+      <w>endmacro</w>
       <w>sqlalchemy</w>
       <w>tablename</w>
+      <w>unstyled</w>
     </words>
   </dictionary>
 </component>
