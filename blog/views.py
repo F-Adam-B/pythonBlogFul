@@ -5,6 +5,7 @@ from .database import session, Entry
 
 PAGINATE_BY = 10
 
+
 @app.route("/")
 @app.route("/page/<int:page>")
 def entries(page=1):
@@ -51,9 +52,26 @@ def add_entry_post():
     return redirect(url_for("entries"))
 
 
-@app.route("/entry/<id>", methods=["GET"])
+@app.route("/entry/<id>")
 # view a single entry by clicking on the title
 def get_entry(id):
-    print(id)
-    id = session.query(Entry.id)
-    return render_template("single_entry.html", id=id)
+    entry = session.query(Entry).filter(Entry.id == id).one()
+    return render_template("get_entry.html", entry=entry)
+
+
+@app.route("/entry/<id>/edit", methods=["GET"])
+def edit_entry_get(id):
+    entry = session.query(Entry).filter(Entry.id == id).one()
+
+    return render_template("edit_entry.html", entry=entry)
+
+
+@app.route("/entry/<id>/edit", methods=["PUT"])
+def edit_entry_put(id, title=None, content=None):
+    entry = session.query(Entry).filter(Entry.id == id).one()
+    entry.title = request.form['title'],
+    entry.content = request.form['content']
+    session.add(entry)
+    session.commit()
+    return redirect(url_for("entries"))
+
