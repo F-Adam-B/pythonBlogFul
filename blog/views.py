@@ -66,12 +66,23 @@ def edit_entry_get(id):
     return render_template("edit_entry.html", entry=entry)
 
 
-@app.route("/entry/<id>/edit", methods=["PUT"])
+@app.route("/entry/<id>/edit", methods=["POST"])
 def edit_entry_put(id, title=None, content=None):
+    print(title)
+    print(content)
     entry = session.query(Entry).filter(Entry.id == id).one()
     entry.title = request.form['title'],
     entry.content = request.form['content']
     session.add(entry)
     session.commit()
     return redirect(url_for("entries"))
+
+@app.route("/entry/<id>/delete")
+def edit_entry_delete(id):
+    entry = session.query(Entry).filter(Entry.id == id).one()
+    session.delete(entry)
+    session.commit()
+    return redirect(url_for("entries"))
+
+
 
