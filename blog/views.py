@@ -1,5 +1,5 @@
 from flask import render_template, request, redirect, url_for, flash
-from flask_login import login_user, login_required
+from flask_login import login_user, login_required, logout_user
 from werkzeug.security import check_password_hash, generate_password_hash
 
 
@@ -60,6 +60,7 @@ def add_entry_post():
 
 
 @app.route("/entry/<id>")
+@login_required
 # view a single entry by clicking on the title
 def get_entry(id):
     entry = session.query(Entry).filter(Entry.id == id).one()
@@ -120,20 +121,27 @@ def signup_get():
 def signup_post():
     email = request.form["email"]
     if session.query(User).filter_by(email=email).first():
-        print('User with that e-mail already exists')
+        flash('User with that e-mail already exists')
         return
 
     password = request.form["password"]
     password_2 = request.form['password_2']
     while len(password) < 4 or password != password_2:
-        password = getpass("Password: ")
-        password_2 = getpass("Re-enter password: ")
+        # password = getpass("Password: ")
+        # password_2 = getpass("Re-enter password: ")
+        flash("Passwords don't match. Try again")
+        return
     user = User(email=email, password=generate_password_hash(password))
     session.add(user)
     session.commit()
 
     return redirect(url_for("login_get"))
 
+
+@app.route('/logout')
+def logout():
+    logout_user()
+    return redirect(url_for("entries"))
 
 
 
