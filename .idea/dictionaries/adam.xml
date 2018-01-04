@@ -5,6 +5,7 @@
       <w>dateformat</w>
       <w>endfor</w>
       <w>endmacro</w>
+      <w>endwith</w>
       <w>sqlalchemy</w>
       <w>tablename</w>
       <w>unstyled</w>
