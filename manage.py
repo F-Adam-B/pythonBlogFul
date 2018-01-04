@@ -42,7 +42,7 @@ def adduser():
         return
 
     password = ""
-    while len(password) < 8 or password != password_2:
+    while len(password) < 4 or password != password_2:
         password = getpass("Password: ")
         password_2 = getpass("Re-enter password: ")
     user = User(name=name, email=email, password=generate_password_hash(password))

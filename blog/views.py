@@ -1,10 +1,12 @@
 from flask import render_template, request, redirect, url_for, flash
 from flask_login import login_user, login_required
-from werkzeug.security import check_password_hash
+from werkzeug.security import check_password_hash, generate_password_hash
 
 
 from blog._init_ import app
 from .database import session, Entry, User
+from getpass import getpass
+
 
 PAGINATE_BY = 10
 
@@ -107,6 +109,30 @@ def login_post():
 
     login_user(user)
     return redirect(request.args.get('next') or url_for("entries"))
+
+
+@app.route("/signup", methods=["GET"])
+def signup_get():
+    return render_template("signup.html")
+
+
+@app.route("/signup", methods=["POST"])
+def signup_post():
+    email = request.form["email"]
+    if session.query(User).filter_by(email=email).first():
+        print('User with that e-mail already exists')
+        return
+
+    password = request.form["password"]
+    password_2 = request.form['password_2']
+    while len(password) < 4 or password != password_2:
+        password = getpass("Password: ")
+        password_2 = getpass("Re-enter password: ")
+    user = User(email=email, password=generate_password_hash(password))
+    session.add(user)
+    session.commit()
+
+    return redirect(url_for("login_get"))
 
 
 
