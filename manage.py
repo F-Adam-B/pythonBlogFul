@@ -3,10 +3,11 @@ import os
 from flask_script import Manager
 from getpass import getpass
 from werkzeug.security import generate_password_hash
+from flask_migrate import Migrate, MigrateCommand
 
 from blog._init_ import app
 
-from blog.database import session, Entry, User
+from blog.database import session, Entry, Base
 
 
 manager = Manager(app)
@@ -33,22 +34,13 @@ def seed():
     session.commit()
 
 
-@manager.command
-def adduser():
-    name = input("Name: ")
-    email = input("Email: ")
-    if session.query(User).filter_by(email=email).first():
-        print('User with that e-mail already exists')
-        return
+class DB(object):
+    def __init__(self, metadata):
+        self.metadata = metadata
 
-    password = ""
-    while len(password) < 4 or password != password_2:
-        password = getpass("Password: ")
-        password_2 = getpass("Re-enter password: ")
-    user = User(name=name, email=email, password=generate_password_hash(password))
-    session.add(user)
-    session.commit()
 
+migrate = Migrate(app, DB(Base.metadata))
+manager.add_command('db', MigrateCommand)
 
 if __name__ == "__main__":
     manager.run()

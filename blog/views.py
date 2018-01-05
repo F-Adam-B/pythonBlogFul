@@ -1,5 +1,5 @@
 from flask import render_template, request, redirect, url_for, flash
-from flask_login import login_user, login_required, logout_user
+from flask_login import login_user, login_required, logout_user, current_user
 from werkzeug.security import check_password_hash, generate_password_hash
 
 
@@ -53,14 +53,15 @@ def add_entry_post():
     entry = Entry(
         title=request.form["title"],
         content=request.form["content"],
+        author=current_user,
     )
     session.add(entry)
     session.commit()
     return redirect(url_for("entries"))
 
 
-@app.route("/entry/<id>")
-@login_required
+@app.route("/entry/<id>", methods=["GET"])
+# @login_required
 # view a single entry by clicking on the title
 def get_entry(id):
     entry = session.query(Entry).filter(Entry.id == id).one()
@@ -70,14 +71,12 @@ def get_entry(id):
 @app.route("/entry/<id>/edit", methods=["GET"])
 def edit_entry_get(id):
     entry = session.query(Entry).filter(Entry.id == id).one()
-
     return render_template("edit_entry.html", entry=entry)
 
 
 @app.route("/entry/<id>/edit", methods=["POST"])
+@login_required
 def edit_entry_put(id, title=None, content=None):
-    print(title)
-    print(content)
     entry = session.query(Entry).filter(Entry.id == id).one()
     entry.title = request.form['title'],
     entry.content = request.form['content']
@@ -87,8 +86,9 @@ def edit_entry_put(id, title=None, content=None):
 
 
 @app.route("/entry/<id>/delete")
+@login_required
 def edit_entry_delete(id):
-    entry = session.query(Entry).filter(Entry.id == id).one()
+    entry = session.query(Entry).get(Entry.id == id).one()
     session.delete(entry)
     session.commit()
     return redirect(url_for("entries"))
@@ -122,16 +122,17 @@ def signup_post():
     email = request.form["email"]
     if session.query(User).filter_by(email=email).first():
         flash('User with that e-mail already exists')
-        return
-
+        return render_template("signup.html")
+    username = request.form["username"]
+    # if session.query(User).filter_by(username=username):
+    #     flash('User with that e-mail already exists')
+    #     return render_template("signup.html")
     password = request.form["password"]
     password_2 = request.form['password_2']
     while len(password) < 4 or password != password_2:
-        # password = getpass("Password: ")
-        # password_2 = getpass("Re-enter password: ")
         flash("Passwords don't match. Try again")
-        return
-    user = User(email=email, password=generate_password_hash(password))
+        return render_template("signup.html")
+    user = User(email=email, username=username, password=generate_password_hash(password))
     session.add(user)
     session.commit()
 

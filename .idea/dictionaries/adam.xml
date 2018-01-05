@@ -6,6 +6,7 @@
       <w>endfor</w>
       <w>endmacro</w>
       <w>endwith</w>
+      <w>navbar</w>
       <w>sqlalchemy</w>
       <w>tablename</w>
       <w>unstyled</w>
