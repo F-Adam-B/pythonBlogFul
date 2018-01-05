@@ -5,6 +5,7 @@
 
 {{ macros.render_entry(entry) }}
 
+<h4><a href="{{ url_for('edit_entry_get', id=entry.id) }}" class="btn btn-default">Edit Post</a></h4>
 
 <ul class="pager">
     {% if has_next %}

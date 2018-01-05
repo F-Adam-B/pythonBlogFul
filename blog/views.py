@@ -59,10 +59,9 @@ def add_entry_post():
     session.commit()
     return redirect(url_for("entries"))
 
-
-@app.route("/entry/<id>", methods=["GET"])
 # @login_required
 # view a single entry by clicking on the title
+@app.route("/entry/<id>", methods=["GET"])
 def get_entry(id):
     entry = session.query(Entry).filter(Entry.id == id).one()
     return render_template("get_entry.html", entry=entry)
@@ -88,7 +87,7 @@ def edit_entry_put(id, title=None, content=None):
 @app.route("/entry/<id>/delete")
 @login_required
 def edit_entry_delete(id):
-    entry = session.query(Entry).get(Entry.id == id).one()
+    entry = session.query(Entry).filter(Entry.id == id).one()
     session.delete(entry)
     session.commit()
     return redirect(url_for("entries"))
